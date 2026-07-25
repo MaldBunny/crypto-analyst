@@ -1,4 +1,3 @@
-from datetime import datetime
 from html import escape
 from pathlib import Path
 from typing import Optional
@@ -7,6 +6,7 @@ from crypto_analyst.analysis import AnalystRead
 from crypto_analyst.market import MarketAsset
 from crypto_analyst.news import NewsItem
 from crypto_analyst.sentiment import FearGreedIndex
+from crypto_analyst.time_utils import MALAYSIA_TZ_LABEL, malaysia_now
 
 
 def save_html_report(
@@ -31,7 +31,7 @@ def build_html_report(
     analyst_read: AnalystRead,
     fear_greed: FearGreedIndex,
 ) -> str:
-    generated_at = datetime.now()
+    generated_at = malaysia_now()
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -137,7 +137,7 @@ def build_html_report(
   <main>
     <header>
       <h1>Crypto Analyst Report</h1>
-      <div class="muted">Generated at {escape(generated_at.strftime('%Y-%m-%d %H:%M'))}</div>
+      <div class="muted">Generated at {escape(generated_at.strftime('%Y-%m-%d %H:%M'))} {MALAYSIA_TZ_LABEL}</div>
     </header>
 
     <section class="grid">

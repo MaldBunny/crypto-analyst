@@ -1,9 +1,9 @@
-from datetime import datetime
 from typing import Optional
 
 from crypto_analyst.analysis import AnalystRead
 from crypto_analyst.market import MarketAsset
 from crypto_analyst.sentiment import FearGreedIndex
+from crypto_analyst.time_utils import MALAYSIA_TZ_LABEL, malaysia_now
 
 
 def build_pulse(
@@ -12,10 +12,10 @@ def build_pulse(
     fear_greed: FearGreedIndex,
     report_url: str = "",
 ) -> str:
-    generated_at = datetime.now()
+    generated_at = malaysia_now()
     lines = [
         f"Crypto Analyst Pulse - {generated_at.strftime('%Y-%m-%d')}",
-        f"Generated at {generated_at.strftime('%H:%M')}",
+        f"Generated at {generated_at.strftime('%H:%M')} {MALAYSIA_TZ_LABEL}",
         "",
         "Market",
     ]
