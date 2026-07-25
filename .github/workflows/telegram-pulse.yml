@@ -1,0 +1,62 @@
+name: Telegram Pulse
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Malaysia time is UTC+8.
+    # 04:00 UTC = 12:00 Malaysia time.
+    # 10:00 UTC = 18:00 Malaysia time.
+    - cron: "0 4,10 * * *"
+
+jobs:
+  send-pulse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Generate HTML report and Pulse
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_CHAT_ID_2: ${{ secrets.TELEGRAM_CHAT_ID_2 }}
+        run: >
+          PYTHONPATH=src python -m crypto_analyst.main
+          --skip-telegram
+          --html-output public/reports/latest.html
+          --pulse-output public/pulse.txt
+          --report-url https://maldbunny.github.io/crypto-analyst/reports/latest.html
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Send Telegram Pulse
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_CHAT_ID_2: ${{ secrets.TELEGRAM_CHAT_ID_2 }}
+        run: PYTHONPATH=src python -m crypto_analyst.send_pulse_file public/pulse.txt
