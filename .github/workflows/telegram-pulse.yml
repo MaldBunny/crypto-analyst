@@ -4,9 +4,10 @@ on:
   workflow_dispatch:
   schedule:
     # Malaysia time is UTC+8.
-    # 04:00 UTC = 12:00 Malaysia time.
-    # 10:00 UTC = 18:00 Malaysia time.
-    - cron: "0 4,10 * * *"
+    # 04:05 UTC = 12:05 Malaysia time.
+    # 10:05 UTC = 18:05 Malaysia time.
+    # Running slightly after the hour avoids GitHub's busiest cron window.
+    - cron: "5 4,10 * * *"
 
 jobs:
   send-pulse:
